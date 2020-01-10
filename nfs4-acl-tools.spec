@@ -1,6 +1,6 @@
 Name:           nfs4-acl-tools
 Version:        0.3.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        The nfs4 ACL tools
 Group:          Applications/System
 License:        BSD
@@ -15,6 +15,7 @@ BuildRequires: libattr-devel
 Patch001: nfs4acl-0.3.3-ace.patch
 
 Patch100: nfs4acl-0.2.0-compile.patch
+Patch002: nfs4-acl-tools-0.3.3-bz769862.patch
 
 %description
 This package contains commandline and GUI ACL utilities for the Linux
@@ -24,6 +25,7 @@ NFSv4 client.
 %setup -q
 
 %patch001 -p1
+%patch002 -p1
 
 %patch100 -p1
 
@@ -56,6 +58,9 @@ rm -rf %{buildroot}
 %{_mandir}/man5/*
 
 %changelog
+* Tue Jan 31 2012 Steve Dickson <steved@redhat.com> - 0.3.3-6
+- Fixed a glibc detection of a double free (bz 769862)
+
 * Mon Nov 16 2009 Steve Dickson <steved@redhat.com> - 0.3.3-5
 - Fixes segfaulting issues with ACEs that have empty mask fields
 
