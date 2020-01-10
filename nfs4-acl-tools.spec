@@ -1,6 +1,6 @@
 Name:           nfs4-acl-tools
 Version:        0.3.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        The nfs4 ACL tools
 Group:          Applications/System
 License:        BSD
@@ -16,6 +16,7 @@ Patch001: nfs4acl-0.3.3-ace.patch
 
 Patch100: nfs4acl-0.2.0-compile.patch
 Patch002: nfs4-acl-tools-0.3.3-bz769862.patch
+Patch003: nfs4acl-0.3.3-ignore-deny-ace.patch
 
 %description
 This package contains commandline and GUI ACL utilities for the Linux
@@ -26,6 +27,8 @@ NFSv4 client.
 
 %patch001 -p1
 %patch002 -p1
+# 1161164 - nfs4_setfacl, nfs4_getfacl ignores DENY ace for...
+%patch003 -p1
 
 %patch100 -p1
 
@@ -58,6 +61,9 @@ rm -rf %{buildroot}
 %{_mandir}/man5/*
 
 %changelog
+* Thu Feb 19 2015 Steve Dickson <steved@redhat.com> - 0.3.3-7
+- Ignore DENY aces for DELETE, WRITE_OWNER, NAMED_ATTRS (bz 1161164)
+
 * Tue Jan 31 2012 Steve Dickson <steved@redhat.com> - 0.3.3-6
 - Fixed a glibc detection of a double free (bz 769862)
 
