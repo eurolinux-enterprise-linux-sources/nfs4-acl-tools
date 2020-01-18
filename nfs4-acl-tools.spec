@@ -1,6 +1,6 @@
 Name:           nfs4-acl-tools
 Version:        0.3.3
-Release:        15%{?dist}
+Release:        17%{?dist}
 Summary:        The nfs4 ACL tools
 Group:          Applications/System
 License:        BSD
@@ -21,6 +21,10 @@ Patch004: nfs4-acl-tools-0.3.3-DENY-ace-for-DELETE-WRITE_OWNE.patch
 #
 Patch005: nfs4-acl-tools-0.3.3-spaceinname.patch
 Patch006: nfs4-acl-tools-0.3.3-fd-leak.patch
+#
+# RHEL 7.4
+#
+Patch007: nfs4-acl-tools-0.3.3-manpage-acls.patch
 
 Patch100: nfs4acl-0.2.0-compile.patch
 
@@ -40,6 +44,8 @@ NFSv4 client.
 %patch005 -p1
 # 1284608 - nfs4-acl-tools: FD leak in edit_ACL() 
 %patch006 -p1
+# 1493905 - Need to add the method used for inheritance-only flag...
+%patch007 -p1
 
 %patch100 -p1
 
@@ -53,7 +59,8 @@ PIE="-fpie"
 RELRO="-Wl,-z,relro,-z,now"
 
 CFLAGS="`echo $RPM_OPT_FLAGS $PIE $RELRO`"
-export LDFLAGS="-pie"
+export LDFLAGS="`echo $PIE $RELRO`"
+
 %configure
 make %{?_smp_mflags}
 
@@ -75,10 +82,16 @@ rm -rf %{buildroot}
 %{_mandir}/man5/*
 
 %changelog
+* Tue Dec 12 2016 Steve Dickson <steved@redhat.com> 0.3.3-17
+- Describe how the Linux server handles inheritable acls (bz 1493905)
+
+* Tue Jun  7 2016 Steve Dickson <steved@redhat.com> 0.3.3-16
+- Fixed the RELRO check (bz 1092556)
+
 * Tue Apr  5 2016 Steve Dickson <steved@redhat.com> 0.3.3-15
 - Allow spaces in group principal names (bz 1284597)
 - Fixed FD leak in edit_ACL() (bz 1284608)
-- Added RELRO check (bz 1092556)
+- Added the RELRO check (bz 1092556)
 
 * Thu Jul 30 2015 Steve Dickson <steved@redhat.com> 0.3.3-14
 - Handle the setting of DENY ace for DELETE, WRITE_OWNER (bz 1160463)
