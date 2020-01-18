@@ -1,6 +1,6 @@
 Name:           nfs4-acl-tools
 Version:        0.3.3
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        The nfs4 ACL tools
 Group:          Applications/System
 License:        BSD
@@ -16,6 +16,11 @@ Patch001: nfs4acl-0.3.3-ace.patch
 Patch002: nfs4acl-0.3.3-memleak.patch
 Patch003: nfs4acl-0.3.3-infile-segfault.patch
 Patch004: nfs4-acl-tools-0.3.3-DENY-ace-for-DELETE-WRITE_OWNE.patch
+#
+# RHEL 7.3
+#
+Patch005: nfs4-acl-tools-0.3.3-spaceinname.patch
+Patch006: nfs4-acl-tools-0.3.3-fd-leak.patch
 
 Patch100: nfs4acl-0.2.0-compile.patch
 
@@ -31,6 +36,10 @@ NFSv4 client.
 %patch003 -p1
 # 1160463 - nfs4_setfacl, nfs4_getfacl ignores DENY ace for DELETE
 %patch004 -p1
+# Bug 1284597 - nfs4_setfacl command fails when NFSv4 group...
+%patch005 -p1
+# 1284608 - nfs4-acl-tools: FD leak in edit_ACL() 
+%patch006 -p1
 
 %patch100 -p1
 
@@ -40,7 +49,10 @@ PIE="-fPIE"
 %else
 PIE="-fpie"
 %endif
-CFLAGS="`echo $RPM_OPT_FLAGS $PIE`"
+
+RELRO="-Wl,-z,relro,-z,now"
+
+CFLAGS="`echo $RPM_OPT_FLAGS $PIE $RELRO`"
 export LDFLAGS="-pie"
 %configure
 make %{?_smp_mflags}
@@ -63,6 +75,11 @@ rm -rf %{buildroot}
 %{_mandir}/man5/*
 
 %changelog
+* Tue Apr  5 2016 Steve Dickson <steved@redhat.com> 0.3.3-15
+- Allow spaces in group principal names (bz 1284597)
+- Fixed FD leak in edit_ACL() (bz 1284608)
+- Added RELRO check (bz 1092556)
+
 * Thu Jul 30 2015 Steve Dickson <steved@redhat.com> 0.3.3-14
 - Handle the setting of DENY ace for DELETE, WRITE_OWNER (bz 1160463)
 
